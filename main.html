@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Journal Club  10 May 2019</title>
+    <link rel="stylesheet" href="./css/reveal.css" />
+    <link rel="stylesheet" href="./css/theme/blood.css" id="theme" />
+    <link rel="stylesheet" href="./css/highlight/monokai.css" />
+    <link rel="stylesheet" href="./css/print/paper.css" type="text/css" media="print" />
+    <link rel="stylesheet" href="./_assets/blood.css" />
+
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"><section  data-markdown><script type="text/template">
+
+
+# Style Augmentation: Data Augmentation via Style Randomization
+Jackson et al, 2019 // [Git](https://github.com/philipjackson/style-augmentation)
+
+</script></section><section ><section data-markdown><script type="text/template"><!-- .slide: data-background="cadiz.jpg" -->
+## 💡 General idea of the paper
+
+</script></section><section data-markdown><script type="text/template">### Style transfer splits content and texture
+Introduce by [*A Neural Algorithm of Artistic Style*](https://arxiv.org/abs/1508.06576), Gatys and al.
+
+Style transfer modify the visual style of an image while preserving its semantic content.
+
+Split an image into its semantic content and object texture.
+
+</script></section><section data-markdown><script type="text/template">### A style transfer model applies a different texture over the same semantic content.
+
+![style transfer example](example_style_transfer.png) <!-- .element height="500px" width="500px" -->
+
+</script></section><section data-markdown><script type="text/template">### Most models classify content
+Classification and regression models determine the content of an image based on pixel information.
+
+Data augmentation teach the models invariance to possible transforms such as rotation,  
+crop ...
+
+We can use style transfer to complement data augmentation.
+
+</script></section></section><section ><section data-markdown><script type="text/template">### Data augmentation is essential and yet not diverse
+Data augmentation is very important to increase the size of the dataset (limiting factor for most problems)
+
+Data augmentation is mostly limited to:
+ - zoom, flip, crop
+ - linear intensity scaling
+ - linear/nonlinear deformation
+
+What about more complex augmentation?
+ - color
+ - texture
+ - complex illumination
+
+</script></section><section data-markdown><script type="text/template">## Style transfer is a new augmentation
+To generate photorealistic images is not a solution! ([Atapour & Breckon](http://openaccess.thecvf.com/content_cvpr_2018/papers/Atapour-Abarghouei_Real-Time_Monocular_Depth_CVPR_2018_paper.pdf), 2018)
+
+A style transfer model can change color, texture, illumination... without change in semantic content.
+
+A one-pass style transfer network with style embedding (100) -> fast and large possibilities.
+
+![style augmentation](style_augmentation.png) <!-- .element height="300px"-->
+
+</script></section></section><section  data-markdown><script type="text/template">### Style transfer is a solution for domain biais
+When a model is too specialize to a type of data ~ overfitting (ex. depth estimation on cars)
+
+![domaine biais](domaine_biais.png) <!-- .element height="300px"-->
+
+Some tricks exists to handle domain biais (transfer learning & fine tuning, post training methods ...)
+
+Style transfer handle domain biais without data from the target dataset
+
+</script></section><section ><section data-markdown><script type="text/template">### Style transfer evolved to be faster and more general
+
+**Content**: High level semantic features.
+
+**Style**: Cross correlation between low levels features (Gram matrix).
+
+Separate loss for content and style:
+
+![Loss content and style](equation1.png) <!-- .element height="200px"-->
+
+That are summed to obtain the general loss function
+
+![Loss concatenate](equation2.png) <!-- .element height="70px"-->
+
+From [*Gatys et al.*](https://arxiv.org/abs/1508.06576) to [*Ghiasi et al.*](https://arxiv.org/abs/1705.06830)
+
+</script></section><section data-markdown><script type="text/template">### Style transfer model
+Fully one pass CNN for style transfer based on style embedding (2.0 ms on 1080Ti).
+
+![Model](model.png) <!-- .element height="500px"-->
+
+</script></section><section data-markdown><script type="text/template">### Parameterization the style transfer
+The final image is a mixture of the original image and the style transferred one.
+
+![parametre alpha](parametre_alpha.png) <!-- .element height="300px"-->
+
+</script></section></section><section ><section data-markdown><script type="text/template">## Experimental results
+ - Image classification
+ - Cross domain classification
+ - Monocular depth estimation
+
+</script></section><section data-markdown><script type="text/template">### Image classification
+STL-10 dataset (10 classes, 500 examples each).
+Perform poorly on ImageNet cause texture is needed.
+
+Tested with Inception V3.
+
+ideal parameters:
+ - 1:2 augmentation
+ - $\alpha$ = 0.5
+
+![grid search](grid_search.png) <!-- .element height="250px"-->
+
+</script></section><section data-markdown><script type="text/template">### Style augmentation increases accuracy on image classification
+Improvement of 8.5%
+
+![plot1](plot1.png) <!-- .element height="450px"-->
+
+</script></section><section data-markdown><script type="text/template">### Cross domain classification
+Office dataset (31 classes, 3 domains: Amazon, DSLR, Webcam)
+
+Tested on InceptionV3, ResNet18, ResNet50, VGG16.
+
+![plot2](plot2.png) <!-- .element height="450px"-->
+
+</script></section><section data-markdown><script type="text/template">### Style augmentation increases accuracy on cross domain classification
+![plot3](plot3.png) <!-- .element height="500px"-->
+
+</script></section><section data-markdown><script type="text/template">### Monocular depth estimation
+Images from synthetic data (65k images from a videogames) for train
+
+Tested with a modified U-net on the KITTI dataset
+
+Augmentation limited: no occlusion, no scaling, no rotation
+
+</script></section><section data-markdown><script type="text/template">### Monocular depth estimation
+![plot4](plot4.png) <!-- .element height="500px"-->
+
+</script></section><section data-markdown><script type="text/template">### Style augmentation increases accuracy on monocular depth estimation
+![plot5](plot5.png) <!-- .element height="450px"-->
+
+</script></section></section><section  data-markdown><script type="text/template">## Conclusion
+Style augmentation can be useful for image classification (under certain conditions)
+
+It is very useful for domain shift and for generated data (ping Pierre 🚲)
+
+▶️ Interesting for new unseen data !
+</script></section></div>
+    </div>
+
+    <script src="./lib/js/head.min.js"></script>
+    <script src="./js/reveal.js"></script>
+
+    <script>
+      function extend() {
+        var target = {};
+        for (var i = 0; i < arguments.length; i++) {
+          var source = arguments[i];
+          for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+              target[key] = source[key];
+            }
+          }
+        }
+        return target;
+      }
+
+      // Optional libraries used to extend on reveal.js
+      var deps = [
+        { src: './lib/js/classList.js', condition: function() { return !document.body.classList; } },
+        { src: './plugin/markdown/marked.js', condition: function() { return !!document.querySelector('[data-markdown]'); } },
+        { src: './plugin/markdown/markdown.js', condition: function() { return !!document.querySelector('[data-markdown]'); } },
+        { src: './plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+        { src: './plugin/zoom-js/zoom.js', async: true },
+        { src: './plugin/notes/notes.js', async: true },
+        { src: './plugin/math/math.js', async: true }
+      ];
+
+      // default options to init reveal.js
+      var defaultOptions = {
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        dependencies: deps
+      };
+
+      // options from URL query string
+      var queryOptions = Reveal.getQueryHash() || {};
+
+      var options = extend(defaultOptions, {"transition":"slide","slideNumber":false}, queryOptions);
+    </script>
+
+
+    <script>
+      Reveal.initialize(options);
+    </script>
+  </body>
+</html>
